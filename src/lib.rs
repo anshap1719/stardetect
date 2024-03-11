@@ -3,6 +3,7 @@ use rayon::prelude::*;
 
 pub use error::Error;
 
+pub mod centroid;
 pub mod error;
 pub mod io;
 
@@ -20,7 +21,7 @@ pub fn get_histogram(image: &DynamicImage) -> GrayscaleHistogram {
     GrayscaleHistogram(histogram_data)
 }
 
-const INITIAL_THRESHOLD: u8 = 230;
+const INITIAL_THRESHOLD: u8 = 150;
 
 pub fn binarize_image(image: &mut DynamicImage) {
     match image {
@@ -220,8 +221,8 @@ pub fn filter_stars(image: &DynamicImage) -> (GrayImage, GrayImage, GrayImage) {
 
 #[cfg(test)]
 mod test {
-    use crate::io::read_image;
     use crate::{get_histogram, GrayscaleHistogram};
+    use crate::io::read_image;
 
     #[test]
     fn sample_image_histogram() {
