@@ -52,6 +52,10 @@ pub fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
                 point.euclidean_distance(&center).max(distance)
             });
 
+            if !(3. ..=20.).contains(&radius) {
+                return None;
+            }
+
             Some(StarCenter {
                 coord: Point {
                     x: center.x() as u32,
