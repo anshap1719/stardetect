@@ -10,7 +10,7 @@ use stardetect::star_count::optimize_threshold_for_star_count;
 use stardetect::ChannelSplit;
 
 fn main() {
-    let image = read_image("./recombined.jpg").unwrap();
+    let image = read_image("./5bef9d1cc91f5635e4274f8df62f6906.jpg").unwrap();
     let transform = ATrousTransform::new(&image, 10, LinearInterpolationKernel);
 
     let mut filtered_image: ImageBuffer<Rgb<f32>, Vec<f32>> =
@@ -19,11 +19,6 @@ fn main() {
     for layer in transform {
         match layer.pixel_scale {
             Some(scale) if scale < 3 => {
-                DynamicImage::ImageRgb32F(layer.image_buffer.clone())
-                    .to_rgb8()
-                    .save(format!("{scale}scale.jpg"))
-                    .unwrap();
-
                 for (x, y, pixel) in layer.image_buffer.enumerate_pixels() {
                     let [r, g, b] = pixel.0;
                     let pixel = filtered_image.get_pixel_mut(x, y);
@@ -39,18 +34,11 @@ fn main() {
 
     filtered_image.channel_wise_rescale();
     let mut filtered_image = DynamicImage::ImageRgb32F(filtered_image);
-    filtered_image.to_rgb8().save("test.jpg").unwrap();
 
     let threshold = optimize_threshold_for_star_count(&filtered_image);
     binarize_image(&mut filtered_image, threshold);
 
     let (red, green, blue) = filtered_image.channel_wise_split();
-
-    filtered_image
-        .to_rgb8()
-        .save("./recombined-binary.jpg")
-        .unwrap();
-
     let rgb_stars = find_rgb_stars(&red, &green, &blue);
 
     for StarCenter { coord, radius } in rgb_stars {
@@ -61,10 +49,6 @@ fn main() {
             Rgba([0, 255, 0, 1]),
         ));
     }
-
-    red.save("./recombined-red.jpg").unwrap();
-    green.save("./recombined-green.jpg").unwrap();
-    blue.save("./recombined-blue.jpg").unwrap();
 
     filtered_image.to_rgb8().save("./final.jpg").unwrap()
 }

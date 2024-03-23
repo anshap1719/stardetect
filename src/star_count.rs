@@ -19,8 +19,6 @@ pub fn optimize_threshold_for_star_count(image: &DynamicImage) -> u8 {
         let mut image = image.clone();
         binarize_image(&mut image, threshold);
 
-        image.to_rgb8().save(format!("{star_count}.jpg")).unwrap();
-
         star_count = find_star_centres_and_size(&image.to_luma8()).len();
     }
 
