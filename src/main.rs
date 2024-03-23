@@ -1,13 +1,15 @@
-use image::{DynamicImage, ImageBuffer, Rgb, Rgba};
+use acap::Euclidean;
+use image::{DynamicImage, ImageBuffer, Rgb};
 use image_dwt::kernels::LinearInterpolationKernel;
 use image_dwt::rescale::RescalableImage;
 use image_dwt::transform::ATrousTransform;
 
 use stardetect::binarize::binarize_image;
-use stardetect::centroid::{find_rgb_stars, StarCenter};
-use stardetect::io::read_image;
-use stardetect::star_count::optimize_threshold_for_star_count;
+use stardetect::centroid::{find_rgb_stars, StarCenters};
 use stardetect::ChannelSplit;
+use stardetect::io::read_image;
+use stardetect::quad::StarQuads;
+use stardetect::star_count::optimize_threshold_for_star_count;
 
 fn main() {
     let image = read_image("./5bef9d1cc91f5635e4274f8df62f6906.jpg").unwrap();
@@ -39,15 +41,12 @@ fn main() {
     binarize_image(&mut filtered_image, threshold);
 
     let (red, green, blue) = filtered_image.channel_wise_split();
-    let rgb_stars = find_rgb_stars(&red, &green, &blue);
+    let stars = StarCenters(find_rgb_stars(&red, &green, &blue));
+    let quads = StarQuads::from(Vec::<Euclidean<[f32; 2]>>::from(stars));
 
-    for StarCenter { coord, radius } in rgb_stars {
-        filtered_image = DynamicImage::ImageRgba8(imageproc::drawing::draw_hollow_circle(
-            &filtered_image,
-            (coord.x as i32, coord.y as i32),
-            (radius as i32).max(4),
-            Rgba([0, 255, 0, 1]),
-        ));
+    for quad in quads.iter() {
+        let hashes = quad.generate_normalized_hashes();
+        dbg!(hashes);
     }
 
     filtered_image.to_rgb8().save("./final.jpg").unwrap()

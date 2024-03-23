@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 
+use acap::Euclidean;
 use geo::{Centroid, Coord, EuclideanDistance, LineString};
 use image::GrayImage;
 use imageproc::point::Point;
@@ -12,11 +13,23 @@ pub struct StarCenter {
     pub radius: u32,
 }
 
+pub struct StarCenters(pub Vec<StarCenter>);
+
 impl Hash for StarCenter {
     fn hash<H: Hasher>(&self, state: &mut H) {
         std::any::TypeId::of::<Self>().hash(state);
         self.coord.x.hash(state);
         self.coord.y.hash(state);
+    }
+}
+
+impl From<StarCenters> for Vec<Euclidean<[f32; 2]>> {
+    fn from(value: StarCenters) -> Self {
+        value
+            .0
+            .into_iter()
+            .map(|item| Euclidean([item.coord.x as f32, item.coord.y as f32]))
+            .collect::<Vec<_>>()
     }
 }
 

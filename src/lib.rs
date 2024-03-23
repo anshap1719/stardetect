@@ -6,6 +6,7 @@ pub mod binarize;
 pub mod centroid;
 pub mod error;
 pub mod io;
+pub mod quad;
 pub mod star_count;
 
 #[derive(Debug, Eq, PartialEq)]

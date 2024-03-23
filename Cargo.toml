@@ -18,3 +18,9 @@ thiserror = "1.0.57"
 imageproc = "0.24.0"
 geo = "0.28.0"
 image-dwt = "0.2.0"
+acap = "0.3.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
