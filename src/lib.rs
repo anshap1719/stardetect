@@ -1,5 +1,4 @@
 use image::{DynamicImage, GenericImageView, GrayImage};
-use rayon::prelude::*;
 
 pub use error::Error;
 
@@ -30,12 +29,6 @@ pub trait ChannelSplit {
 impl ChannelSplit for DynamicImage {
     fn channel_wise_split(&self) -> (GrayImage, GrayImage, GrayImage) {
         match self {
-            DynamicImage::ImageLuma8(image) => {
-                todo!()
-            }
-            DynamicImage::ImageLumaA8(image) => {
-                todo!()
-            }
             DynamicImage::ImageRgb8(image) => {
                 let image_buffer_size = (image.width() * image.height()) as usize;
 
@@ -55,21 +48,6 @@ impl ChannelSplit for DynamicImage {
 
                 (red, green, blue)
             }
-            DynamicImage::ImageRgba8(image) => {
-                todo!()
-            }
-            DynamicImage::ImageLuma16(image) => {
-                todo!()
-            }
-            DynamicImage::ImageLumaA16(image) => {
-                todo!()
-            }
-            DynamicImage::ImageRgb16(image) => {
-                todo!()
-            }
-            DynamicImage::ImageRgba16(image) => {
-                todo!()
-            }
             DynamicImage::ImageRgb32F(image) => {
                 let image_buffer_size = (image.width() * image.height()) as usize;
 
@@ -88,9 +66,6 @@ impl ChannelSplit for DynamicImage {
                 let blue = GrayImage::from_raw(image.width(), image.height(), blue).unwrap();
 
                 (red, green, blue)
-            }
-            DynamicImage::ImageRgba32F(image) => {
-                todo!()
             }
             image => {
                 let image_buffer_size = (image.width() * image.height()) as usize;
