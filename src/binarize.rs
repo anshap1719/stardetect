@@ -95,8 +95,7 @@ pub fn binarize_image(image: &mut DynamicImage, threshold: u8) {
             }
         }
         DynamicImage::ImageRgb32F(image) => {
-            let scale_factor = u32::MAX / u8::MAX as u32;
-            let scaled_threshold = (threshold as f32 * scale_factor as f32) / f32::MAX;
+            let scaled_threshold = threshold as f32 / u8::MAX as f32;
 
             for pixel in image.iter_mut() {
                 if *pixel > scaled_threshold {
@@ -107,8 +106,7 @@ pub fn binarize_image(image: &mut DynamicImage, threshold: u8) {
             }
         }
         DynamicImage::ImageRgba32F(image) => {
-            let scale_factor = u32::MAX / u8::MAX as u32;
-            let scaled_threshold = (threshold as f32 * scale_factor as f32) / f32::MAX;
+            let scaled_threshold = threshold as f32 / u8::MAX as f32;
 
             for pixel in image.iter_mut() {
                 if *pixel > scaled_threshold {

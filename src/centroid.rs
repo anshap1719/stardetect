@@ -68,20 +68,20 @@ pub fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
 }
 
 pub fn find_rgb_stars(red: &GrayImage, green: &GrayImage, blue: &GrayImage) -> Vec<StarCenter> {
-    let red_star_centers_and_sizes = find_star_centres_and_size(&red)
+    let red_star_centers_and_sizes = find_star_centres_and_size(red)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
-    let green_star_centers_and_sizes = find_star_centres_and_size(&green)
+    let green_star_centers_and_sizes = find_star_centres_and_size(green)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
-    let blue_star_centers_and_sizes = find_star_centres_and_size(&blue)
+    let blue_star_centers_and_sizes = find_star_centres_and_size(blue)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
 
     red_star_centers_and_sizes
-        .union(
+        .intersection(
             &green_star_centers_and_sizes
-                .union(&blue_star_centers_and_sizes)
+                .intersection(&blue_star_centers_and_sizes)
                 .copied()
                 .collect(),
         )

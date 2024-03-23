@@ -23,78 +23,95 @@ pub fn get_histogram(image: &DynamicImage) -> GrayscaleHistogram {
     GrayscaleHistogram(histogram_data)
 }
 
-pub fn filter_stars(image: &DynamicImage) -> (GrayImage, GrayImage, GrayImage) {
-    let images = match image {
-        DynamicImage::ImageLuma8(image) => {
-            todo!()
-        }
-        DynamicImage::ImageLumaA8(image) => {
-            todo!()
-        }
-        DynamicImage::ImageRgb8(image) => {
-            let image_buffer_size = (image.width() * image.height()) as usize;
-            let mut red_stars = Vec::with_capacity(image_buffer_size);
-            let mut green_stars = Vec::with_capacity(image_buffer_size);
-            let mut blue_stars = Vec::with_capacity(image_buffer_size);
+pub trait ChannelSplit {
+    fn channel_wise_split(&self) -> (GrayImage, GrayImage, GrayImage);
+}
 
-            for pixel in image.pixels() {
-                red_stars.push(pixel.0[0]);
-                green_stars.push(pixel.0[1]);
-                blue_stars.push(pixel.0[2]);
+impl ChannelSplit for DynamicImage {
+    fn channel_wise_split(&self) -> (GrayImage, GrayImage, GrayImage) {
+        match self {
+            DynamicImage::ImageLuma8(image) => {
+                todo!()
             }
-
-            let red_stars = GrayImage::from_raw(image.width(), image.height(), red_stars).unwrap();
-            let green_stars =
-                GrayImage::from_raw(image.width(), image.height(), green_stars).unwrap();
-            let blue_stars =
-                GrayImage::from_raw(image.width(), image.height(), blue_stars).unwrap();
-
-            (red_stars, green_stars, blue_stars)
-        }
-        DynamicImage::ImageRgba8(image) => {
-            todo!()
-        }
-        DynamicImage::ImageLuma16(image) => {
-            todo!()
-        }
-        DynamicImage::ImageLumaA16(image) => {
-            todo!()
-        }
-        DynamicImage::ImageRgb16(image) => {
-            todo!()
-        }
-        DynamicImage::ImageRgba16(image) => {
-            todo!()
-        }
-        DynamicImage::ImageRgb32F(image) => {
-            todo!()
-        }
-        DynamicImage::ImageRgba32F(image) => {
-            todo!()
-        }
-        image => {
-            let image_buffer_size = (image.width() * image.height()) as usize;
-            let mut red_stars = Vec::with_capacity(image_buffer_size);
-            let mut green_stars = Vec::with_capacity(image_buffer_size);
-            let mut blue_stars = Vec::with_capacity(image_buffer_size);
-
-            for pixel in image.pixels() {
-                red_stars.push(pixel.2[0]);
-                green_stars.push(pixel.2[1]);
-                blue_stars.push(pixel.2[2]);
+            DynamicImage::ImageLumaA8(image) => {
+                todo!()
             }
+            DynamicImage::ImageRgb8(image) => {
+                let image_buffer_size = (image.width() * image.height()) as usize;
 
-            let red_stars = GrayImage::from_raw(image.width(), image.height(), red_stars).unwrap();
-            let green_stars =
-                GrayImage::from_raw(image.width(), image.height(), green_stars).unwrap();
-            let blue_stars =
-                GrayImage::from_raw(image.width(), image.height(), blue_stars).unwrap();
+                let mut red = Vec::with_capacity(image_buffer_size);
+                let mut green = Vec::with_capacity(image_buffer_size);
+                let mut blue = Vec::with_capacity(image_buffer_size);
 
-            (red_stars, green_stars, blue_stars)
+                for pixel in image.pixels() {
+                    red.push(pixel.0[0]);
+                    green.push(pixel.0[1]);
+                    blue.push(pixel.0[2]);
+                }
+
+                let red = GrayImage::from_raw(image.width(), image.height(), red).unwrap();
+                let green = GrayImage::from_raw(image.width(), image.height(), green).unwrap();
+                let blue = GrayImage::from_raw(image.width(), image.height(), blue).unwrap();
+
+                (red, green, blue)
+            }
+            DynamicImage::ImageRgba8(image) => {
+                todo!()
+            }
+            DynamicImage::ImageLuma16(image) => {
+                todo!()
+            }
+            DynamicImage::ImageLumaA16(image) => {
+                todo!()
+            }
+            DynamicImage::ImageRgb16(image) => {
+                todo!()
+            }
+            DynamicImage::ImageRgba16(image) => {
+                todo!()
+            }
+            DynamicImage::ImageRgb32F(image) => {
+                let image_buffer_size = (image.width() * image.height()) as usize;
+
+                let mut red = Vec::with_capacity(image_buffer_size);
+                let mut green = Vec::with_capacity(image_buffer_size);
+                let mut blue = Vec::with_capacity(image_buffer_size);
+
+                for pixel in image.pixels() {
+                    red.push((u8::MAX as f32 * pixel.0[0]) as u8);
+                    green.push((u8::MAX as f32 * pixel.0[1]) as u8);
+                    blue.push((u8::MAX as f32 * pixel.0[2]) as u8);
+                }
+
+                let red = GrayImage::from_raw(image.width(), image.height(), red).unwrap();
+                let green = GrayImage::from_raw(image.width(), image.height(), green).unwrap();
+                let blue = GrayImage::from_raw(image.width(), image.height(), blue).unwrap();
+
+                (red, green, blue)
+            }
+            DynamicImage::ImageRgba32F(image) => {
+                todo!()
+            }
+            image => {
+                let image_buffer_size = (image.width() * image.height()) as usize;
+                let mut red = Vec::with_capacity(image_buffer_size);
+                let mut green = Vec::with_capacity(image_buffer_size);
+                let mut blue = Vec::with_capacity(image_buffer_size);
+
+                for pixel in image.pixels() {
+                    red.push(pixel.2[0]);
+                    green.push(pixel.2[1]);
+                    blue.push(pixel.2[2]);
+                }
+
+                let red = GrayImage::from_raw(image.width(), image.height(), red).unwrap();
+                let green = GrayImage::from_raw(image.width(), image.height(), green).unwrap();
+                let blue = GrayImage::from_raw(image.width(), image.height(), blue).unwrap();
+
+                (red, green, blue)
+            }
         }
-    };
-
-    images
+    }
 }
 
 #[cfg(test)]
