@@ -1,19 +1,26 @@
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 
-use acap::Euclidean;
 use geo::{Centroid, Coord, EuclideanDistance, LineString};
 use image::GrayImage;
 use imageproc::point::Point;
 use rayon::prelude::*;
 
-#[derive(Eq, PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub struct StarCenter {
-    pub coord: Point<u32>,
-    pub radius: u32,
+    coord: Point<u32>,
+    radius: u32,
 }
 
-pub struct StarCenters(pub Vec<StarCenter>);
+impl StarCenter {
+    pub fn coord(&self) -> &Point<u32> {
+        &self.coord
+    }
+
+    pub fn radius(&self) -> u32 {
+        self.radius
+    }
+}
 
 impl Hash for StarCenter {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -23,17 +30,7 @@ impl Hash for StarCenter {
     }
 }
 
-impl From<StarCenters> for Vec<Euclidean<[f32; 2]>> {
-    fn from(value: StarCenters) -> Self {
-        value
-            .0
-            .into_iter()
-            .map(|item| Euclidean([item.coord.x as f32, item.coord.y as f32]))
-            .collect::<Vec<_>>()
-    }
-}
-
-pub fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
+pub(crate) fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
     let contours = imageproc::contours::find_contours::<u32>(image);
 
     contours
@@ -80,7 +77,11 @@ pub fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
         .collect()
 }
 
-pub fn find_rgb_stars(red: &GrayImage, green: &GrayImage, blue: &GrayImage) -> Vec<StarCenter> {
+pub(crate) fn find_rgb_stars(
+    red: &GrayImage,
+    green: &GrayImage,
+    blue: &GrayImage,
+) -> Vec<StarCenter> {
     let red_star_centers_and_sizes = find_star_centres_and_size(red)
         .into_iter()
         .collect::<HashSet<StarCenter>>();

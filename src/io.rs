@@ -2,6 +2,7 @@
 
 use image::{DynamicImage, ImageBuffer, Rgb};
 use imagepipe::{ImageSource, Pipeline};
+use std::path::Path;
 
 use crate::error::{RawPipelineError, UnknownError};
 use crate::Error;
@@ -13,7 +14,7 @@ use crate::Error;
 ///
 /// # Errors
 /// If image cannot be read
-pub fn read_image(path: &str) -> Result<DynamicImage, Error> {
+pub(crate) fn read_image(path: &Path) -> Result<DynamicImage, Error> {
     match image::open(path) {
         Ok(image) => Ok(image),
         Err(_) => Ok(read_raw_image(path)?),
@@ -23,7 +24,7 @@ pub fn read_image(path: &str) -> Result<DynamicImage, Error> {
 /// Given a path to a file, attempt to read the RAW image.
 /// All formats and cameras supported by rawloader crate
 /// [rawloader](https://github.com/pedrocr/rawloader) are supported.
-pub(crate) fn read_raw_image(path: &str) -> Result<DynamicImage, Error> {
+pub(crate) fn read_raw_image(path: &Path) -> Result<DynamicImage, Error> {
     let raw = rawloader::decode_file(path)?;
 
     let source = ImageSource::Raw(raw);
