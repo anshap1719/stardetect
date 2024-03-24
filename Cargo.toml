@@ -2,6 +2,15 @@
 name = "stardetect"
 version = "0.1.0"
 edition = "2021"
+authors = ["Anshul Sanghi <anshul@anshulsanghi.tech>"]
+description = "Detect star positions and sizes in an image"
+homepage = "https://github.com/anshap1719/stardetect"
+repository = "https://github.com/anshap1719/stardetect"
+keywords = ["image", "wavelet", "multiscale", "analysis", "astronomy"]
+categories = ["multimedia"]
+license = "Apache-2.0"
+readme = "./README.md"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
