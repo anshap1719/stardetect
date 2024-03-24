@@ -10,7 +10,7 @@ use image_dwt::transform::ATrousTransform;
 use imageproc::drawing::Canvas;
 use std::path::Path;
 
-mod centroid;
+pub mod centroid;
 mod error;
 mod image_extensions;
 mod io;
