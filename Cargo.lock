@@ -521,13 +521,12 @@ dependencies = [
 
 [[package]]
 name = "image-dwt"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88c8b25d3a74ad91784f6984834edb761d9466d715df65e8ad515d2453b9f4dd"
+checksum = "6ef2e8379da1fdf6a44bdb76503f8c471df190272c7d7717caee0d64095c898b"
 dependencies = [
  "image 0.25.0",
  "ndarray",
- "tiff",
 ]
 
 [[package]]

@@ -3,9 +3,9 @@ use crate::image_extensions::ImageExtensions;
 use crate::io::read_image;
 use crate::threshold::ThresholdingExtensions;
 pub use error::Error;
-use image::{DynamicImage, ImageBuffer, Rgb};
+use image::DynamicImage;
 use image_dwt::kernels::LinearInterpolationKernel;
-use image_dwt::rescale::RescalableImage;
+use image_dwt::recompose::{OutputLayer, RecomposableWaveletLayers};
 use image_dwt::transform::ATrousTransform;
 use imageproc::drawing::Canvas;
 use std::path::Path;
@@ -75,31 +75,16 @@ impl StarDetect {
 
         let decomposition_levels = ((smallest_side as f32).ln() as usize).min(10);
 
-        let transform = ATrousTransform::new(
+        let mut filtered_image = ATrousTransform::new(
             &self.source,
             decomposition_levels,
             LinearInterpolationKernel,
-        );
-
-        let mut filtered_image: ImageBuffer<Rgb<f32>, Vec<f32>> = ImageBuffer::new(width, height);
-        for layer in transform {
-            match layer.pixel_scale {
-                Some(scale) if scale < decomposition_levels / 2 => {
-                    for (x, y, pixel) in layer.image_buffer.enumerate_pixels() {
-                        let [r, g, b] = pixel.0;
-                        let pixel = filtered_image.get_pixel_mut(x, y);
-
-                        let [r_existing, g_existing, b_existing] = pixel.0;
-
-                        *pixel = Rgb([r + r_existing, g + g_existing, b + b_existing]);
-                    }
-                }
-                None | Some(_) => {}
-            }
-        }
-
-        filtered_image.channel_wise_rescale();
-        let mut filtered_image = DynamicImage::ImageRgb32F(filtered_image);
+        )
+        .filter(|item| {
+            item.pixel_scale
+                .is_some_and(|scale| scale < decomposition_levels / 2)
+        })
+        .recompose_into_image(width as usize, height as usize, OutputLayer::Rgb);
 
         let threshold = filtered_image.optimize_threshold_for_star_count::<500>();
         filtered_image.binarize(threshold);
