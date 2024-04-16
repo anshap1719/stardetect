@@ -25,4 +25,4 @@ To use this library in your Rust project, add the following to your `Cargo.toml`
 
 ```toml
 [dependencies]
-stardetect = "0.1.0"
+stardetect = "0.3.0"
