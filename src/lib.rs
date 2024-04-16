@@ -18,6 +18,7 @@ mod threshold;
 
 pub struct StarDetect {
     source: DynamicImage,
+    minimum_star_count: usize,
 }
 
 impl TryFrom<&Path> for StarDetect {
@@ -26,7 +27,10 @@ impl TryFrom<&Path> for StarDetect {
     fn try_from(value: &Path) -> Result<Self, Self::Error> {
         let image = read_image(value)?;
 
-        Ok(Self { source: image })
+        Ok(Self {
+            source: image,
+            minimum_star_count: 1000,
+        })
     }
 }
 
@@ -36,7 +40,10 @@ impl TryFrom<&str> for StarDetect {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let image = read_image(Path::new(value))?;
 
-        Ok(Self { source: image })
+        Ok(Self {
+            source: image,
+            minimum_star_count: 1000,
+        })
     }
 }
 
@@ -46,7 +53,10 @@ impl TryFrom<String> for StarDetect {
     fn try_from(value: String) -> Result<Self, Self::Error> {
         let image = read_image(Path::new(&value))?;
 
-        Ok(Self { source: image })
+        Ok(Self {
+            source: image,
+            minimum_star_count: 1000,
+        })
     }
 }
 
@@ -54,7 +64,10 @@ impl TryFrom<DynamicImage> for StarDetect {
     type Error = Error;
 
     fn try_from(value: DynamicImage) -> Result<Self, Self::Error> {
-        Ok(Self { source: value })
+        Ok(Self {
+            source: value,
+            minimum_star_count: 1000,
+        })
     }
 }
 
@@ -64,16 +77,22 @@ impl<'a> TryFrom<&'a DynamicImage> for StarDetect {
     fn try_from(value: &'a DynamicImage) -> Result<Self, Self::Error> {
         Ok(Self {
             source: value.clone(),
+            minimum_star_count: 1000,
         })
     }
 }
 
 impl StarDetect {
+    pub fn with_minimum_star_count(mut self, minimum_star_count: usize) -> Self {
+        self.minimum_star_count = minimum_star_count;
+        self
+    }
+
     pub fn compute_star_centers(&self) -> Vec<StarCenter> {
         let (width, height) = self.source.dimensions();
         let smallest_side = width.min(height);
 
-        let decomposition_levels = ((smallest_side as f32).ln() as usize).min(10);
+        let decomposition_levels = ((smallest_side as f32).ln() as usize).min(20);
 
         let mut filtered_image = ATrousTransform::new(
             &self.source,
@@ -86,7 +105,7 @@ impl StarDetect {
         })
         .recompose_into_image(width as usize, height as usize, OutputLayer::Rgb);
 
-        let threshold = filtered_image.optimize_threshold_for_star_count::<500>();
+        let threshold = filtered_image.optimize_threshold_for_star_count(self.minimum_star_count);
         filtered_image.binarize(threshold);
 
         let (red, green, blue) = filtered_image.channel_wise_split();

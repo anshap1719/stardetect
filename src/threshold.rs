@@ -3,16 +3,16 @@ use image::DynamicImage;
 use crate::centroid::find_star_centres_and_size;
 
 pub(crate) trait ThresholdingExtensions {
-    fn optimize_threshold_for_star_count<const MIN_STAR_COUNT: usize>(&self) -> u8;
+    fn optimize_threshold_for_star_count(&self, minimum_star_count: usize) -> u8;
     fn binarize(&mut self, threshold: u8);
 }
 
 impl ThresholdingExtensions for DynamicImage {
-    fn optimize_threshold_for_star_count<const MIN_STAR_COUNT: usize>(&self) -> u8 {
+    fn optimize_threshold_for_star_count(&self, minimum_star_count: usize) -> u8 {
         let mut star_count = 0;
         let mut threshold = 255;
 
-        while star_count < MIN_STAR_COUNT {
+        while star_count < minimum_star_count {
             if threshold == 0 {
                 panic!("Maximum iteration count reached");
             }
