@@ -3,12 +3,22 @@ use image::DynamicImage;
 use crate::centroid::find_star_centres_and_size;
 
 pub(crate) trait ThresholdingExtensions {
-    fn optimize_threshold_for_star_count(&self, minimum_star_count: usize) -> u8;
+    fn optimize_threshold_for_star_count(
+        &self,
+        minimum_star_count: usize,
+        min_size: usize,
+        max_size: usize,
+    ) -> u8;
     fn binarize(&mut self, threshold: u8);
 }
 
 impl ThresholdingExtensions for DynamicImage {
-    fn optimize_threshold_for_star_count(&self, minimum_star_count: usize) -> u8 {
+    fn optimize_threshold_for_star_count(
+        &self,
+        minimum_star_count: usize,
+        min_size: usize,
+        max_size: usize,
+    ) -> u8 {
         let mut star_count = 0;
         let mut threshold = 255;
 
@@ -22,7 +32,7 @@ impl ThresholdingExtensions for DynamicImage {
             let mut image = self.clone();
             ThresholdingExtensions::binarize(&mut image, threshold);
 
-            star_count = find_star_centres_and_size(&image.to_luma8()).len();
+            star_count = find_star_centres_and_size(&image.to_luma8(), min_size, max_size).len();
         }
 
         threshold

@@ -30,7 +30,11 @@ impl Hash for StarCenter {
     }
 }
 
-pub(crate) fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
+pub(crate) fn find_star_centres_and_size(
+    image: &GrayImage,
+    min_size: usize,
+    max_size: usize,
+) -> Vec<StarCenter> {
     let contours = imageproc::contours::find_contours::<u32>(image);
 
     contours
@@ -62,7 +66,7 @@ pub(crate) fn find_star_centres_and_size(image: &GrayImage) -> Vec<StarCenter> {
                 point.euclidean_distance(&center).max(distance)
             });
 
-            if !(1. ..=24.).contains(&radius) {
+            if !(min_size..=max_size).contains(&(radius as usize)) {
                 return None;
             }
 
@@ -81,14 +85,16 @@ pub(crate) fn find_rgb_stars(
     red: &GrayImage,
     green: &GrayImage,
     blue: &GrayImage,
+    min_size: usize,
+    max_size: usize,
 ) -> Vec<StarCenter> {
-    let red_star_centers_and_sizes = find_star_centres_and_size(red)
+    let red_star_centers_and_sizes = find_star_centres_and_size(red, min_size, max_size)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
-    let green_star_centers_and_sizes = find_star_centres_and_size(green)
+    let green_star_centers_and_sizes = find_star_centres_and_size(green, min_size, max_size)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
-    let blue_star_centers_and_sizes = find_star_centres_and_size(blue)
+    let blue_star_centers_and_sizes = find_star_centres_and_size(blue, min_size, max_size)
         .into_iter()
         .collect::<HashSet<StarCenter>>();
 

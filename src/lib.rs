@@ -19,6 +19,8 @@ mod threshold;
 pub struct StarDetect {
     source: DynamicImage,
     minimum_star_count: usize,
+    minimum_star_size: usize,
+    maximum_star_size: usize,
 }
 
 impl TryFrom<&Path> for StarDetect {
@@ -30,6 +32,8 @@ impl TryFrom<&Path> for StarDetect {
         Ok(Self {
             source: image,
             minimum_star_count: 1000,
+            minimum_star_size: 1,
+            maximum_star_size: 24,
         })
     }
 }
@@ -43,6 +47,8 @@ impl TryFrom<&str> for StarDetect {
         Ok(Self {
             source: image,
             minimum_star_count: 1000,
+            minimum_star_size: 1,
+            maximum_star_size: 24,
         })
     }
 }
@@ -56,6 +62,8 @@ impl TryFrom<String> for StarDetect {
         Ok(Self {
             source: image,
             minimum_star_count: 1000,
+            minimum_star_size: 1,
+            maximum_star_size: 24,
         })
     }
 }
@@ -67,6 +75,8 @@ impl TryFrom<DynamicImage> for StarDetect {
         Ok(Self {
             source: value,
             minimum_star_count: 1000,
+            minimum_star_size: 1,
+            maximum_star_size: 24,
         })
     }
 }
@@ -78,6 +88,8 @@ impl<'a> TryFrom<&'a DynamicImage> for StarDetect {
         Ok(Self {
             source: value.clone(),
             minimum_star_count: 1000,
+            minimum_star_size: 1,
+            maximum_star_size: 24,
         })
     }
 }
@@ -85,6 +97,16 @@ impl<'a> TryFrom<&'a DynamicImage> for StarDetect {
 impl StarDetect {
     pub fn with_minimum_star_count(mut self, minimum_star_count: usize) -> Self {
         self.minimum_star_count = minimum_star_count;
+        self
+    }
+
+    pub fn with_minimum_star_size(mut self, minimum_star_size: usize) -> Self {
+        self.minimum_star_size = minimum_star_size;
+        self
+    }
+
+    pub fn with_maximum_star_size(mut self, maximum_star_size: usize) -> Self {
+        self.maximum_star_size = maximum_star_size;
         self
     }
 
@@ -105,10 +127,20 @@ impl StarDetect {
         })
         .recompose_into_image(width as usize, height as usize, OutputLayer::Rgb);
 
-        let threshold = filtered_image.optimize_threshold_for_star_count(self.minimum_star_count);
+        let threshold = filtered_image.optimize_threshold_for_star_count(
+            self.minimum_star_count,
+            self.minimum_star_size,
+            self.maximum_star_size,
+        );
         filtered_image.binarize(threshold);
 
         let (red, green, blue) = filtered_image.channel_wise_split();
-        find_rgb_stars(&red, &green, &blue)
+        find_rgb_stars(
+            &red,
+            &green,
+            &blue,
+            self.minimum_star_size,
+            self.maximum_star_size,
+        )
     }
 }
